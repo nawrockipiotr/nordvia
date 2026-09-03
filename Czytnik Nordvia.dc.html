@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nordvia">
+<meta name="theme-color" content="#0b1d3e">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{
+  /* Paleta WZ UW jak w odtwarzaczu podcastów: granat 281C #142A5B, ciemny 296C #081732,
+     niebieski 2728C #284BA9, złoty 110C #D8BC44. Jasny motyw do długiego czytania. */
+  --tlo:#f4f5f7;--tlo2:#e8ebf2;--karta:#ffffff;--tekst:#081732;--tekst2:#4c5871;
+  --linia:#d2d8e4;--akcent:#142A5B;--akcent-tlo:#e4e9f4;--zloto:#8a6f16;--zloto-tlo:#f3ecd2;--postep:#284BA9;
+  --promien:12px;--przejscie:340ms cubic-bezier(.32,.72,0,1);
+  --serif:Charter,"Iowan Old Style",Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+[data-motyw="ciemny"]{
+  --tlo:#0b1d3e;--tlo2:#142A5B;--karta:#172b55;--tekst:#f4f5f7;--tekst2:#c3cad8;
+  --linia:rgba(160,168,182,.3);--akcent:#D8BC44;--akcent-tlo:#22396e;--zloto:#D8BC44;--zloto-tlo:rgba(216,188,68,.16);--postep:#7fa8e8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--tlo);color:var(--tekst);-webkit-text-size-adjust:100%}
+a{color:var(--akcent)}
+a:hover{color:var(--tekst)}
+.logo-mono{opacity:.9;filter:invert(1)}
+[data-motyw="ciemny"] .logo-mono{filter:none}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--zloto);outline-offset:2px}
+.tresc{font-family:var(--serif);line-height:1.65;color:var(--tekst)}
+[data-kopiowanie="zablokowane"] .tresc{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-touch-callout:none}
+[data-kopiowanie="zablokowane"] .tresc figure img{pointer-events:auto;-webkit-user-drag:none}
+.tresc>p:first-child em{font-family:var(--sans);font-style:normal;font-size:.84em;letter-spacing:.01em;color:var(--tekst2)}
+.tresc p{margin:0 0 1.05em;text-wrap:pretty}
+.tresc h3{font-family:var(--sans);font-size:.95em;font-weight:650;letter-spacing:.01em;margin:2.2em 0 .8em;color:var(--tekst)}
+.tresc ul,.tresc ol{margin:0 0 1.1em;padding-left:1.4em}
+.tresc li{margin:0 0 .45em}
+.tresc blockquote.pismo{font-family:var(--sans);font-size:.86em;line-height:1.5;background:var(--tlo2);border:1px solid var(--linia);border-radius:var(--promien);padding:1.1em 1.2em .2em;margin:1.8em 0}
+.tresc section.dane{font-family:var(--sans);font-size:.88em;line-height:1.5;background:var(--akcent-tlo);border:0;border-top:3px solid var(--akcent);border-radius:0 0 var(--promien) var(--promien);padding:1.2em 1.3em;margin:2.4em 0}
+.tresc section.dane>h3:first-child{margin:0 0 .9em;font-size:.8em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--akcent)}
+.tresc section.dane strong{font-weight:650}
+.tresc .obwoluta{position:relative;margin:1.2em 0 1.6em;padding-top:3.1em}
+@media (min-width:1180px){.tresc>.obwoluta{width:calc(100% + 6rem);margin-left:-3rem}}
+/* Na telefonie rysunek zabiera pełną szerokość — wykres w 265 px jest nieczytelny. */
+@media (max-width:560px){
+  .tresc figure{margin-left:-1.1rem;margin-right:-1.1rem}
+  .tresc section.dane figure{margin-left:calc(-1.3em - 1.1rem);margin-right:calc(-1.3em - 1.1rem)}
+  .tresc figure img{border-radius:0}
+  .tresc figcaption,.tresc .narzedzia-rysunku{padding-left:1.1rem;padding-right:1.1rem}
+  .tresc section.dane figcaption,.tresc section.dane .narzedzia-rysunku{padding-left:calc(1.3em + 1.1rem);padding-right:calc(1.3em + 1.1rem)}
+}
+.tresc .przewijak{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--linia);border-radius:8px;background:var(--tlo)}
+.tresc table{font-family:var(--sans);font-size:.82em;line-height:1.4;border-collapse:collapse;width:100%;max-width:100%;table-layout:auto}
+.tresc td.zwarta,.tresc th.zwarta{white-space:nowrap}
+.tresc th,.tresc td{padding:.55em .7em;text-align:left;vertical-align:top;border-bottom:1px solid var(--linia);white-space:normal;overflow-wrap:break-word;hyphens:auto}
+.tresc td:first-child,.tresc th:first-child{min-width:0}
+.tresc table.wielokolumnowa{font-size:.76em}
+@media (max-width:560px){
+  .tresc table.karty,.tresc table.karty tbody,.tresc table.karty tr,.tresc table.karty td,.tresc table.karty th{display:block;width:auto}
+  .tresc table.karty thead,.tresc table.karty tr.naglowek-tabeli{display:none}
+  .tresc table.karty tr{border-bottom:1px solid var(--linia);padding:.7em 0}
+  .tresc table.karty tr:last-child{border-bottom:0}
+  .tresc table.karty td,.tresc table.karty th{border:0;padding:.15em 0;display:grid;grid-template-columns:minmax(0,8.5em) minmax(0,1fr);gap:.6em;text-align:left}
+  .tresc table.karty td::before,.tresc table.karty th::before{content:attr(data-etykieta);font-weight:600;color:var(--tekst2)}
+  .tresc table.karty tr>*:first-child{font-weight:700;color:var(--akcent);margin-bottom:.25em;display:block}
+  .tresc table.karty td.zwarta{white-space:normal}
+}
+.tresc table.wielokolumnowa th,.tresc table.wielokolumnowa td{padding:.5em .45em}
+.tresc th{font-weight:650;border-bottom:1px solid var(--tekst2)}
+.tresc tr:last-child td{border-bottom:none}
+.tresc .narzedzia-tabeli{position:absolute;top:0;right:0;display:flex;justify-content:flex-end;gap:.5em;z-index:2;max-width:100%}
+.tresc .narzedzia-tabeli button,.tresc .narzedzia-rysunku button{font-family:var(--sans);font-size:11px;letter-spacing:.02em;min-height:44px;padding:0 .9em;border:1px solid var(--linia);border-radius:999px;background:var(--karta);color:var(--tekst2);cursor:pointer}
+.tresc .narzedzia-tabeli button:hover,.tresc .narzedzia-rysunku button:hover{color:var(--tekst);border-color:var(--tekst2)}
+.tresc figure{margin:2em 0}
+.tresc figure img{display:block;width:100%;height:auto;background:#fff;border-radius:6px;cursor:zoom-in}
+.tresc figcaption{font-family:var(--sans);font-size:.8em;line-height:1.45;margin-top:.8em;color:var(--tekst)}
+.tresc .nota{font-family:var(--sans);font-size:.78em;line-height:1.45;color:var(--tekst2);margin:.4em 0 0}
+.tresc .narzedzia-rysunku{display:flex;gap:.5em;margin-top:.6em}
+.tresc ol.zadania{list-style:none;counter-reset:zad;padding:0;margin:1.6em 0;display:grid;gap:.75em}
+.tresc ol.zadania li{counter-increment:zad;font-family:var(--sans);font-size:.9em;line-height:1.5;background:var(--karta);border:1px solid var(--linia);border-left:3px solid var(--zloto);border-radius:var(--promien);padding:1em 1.1em 1em 3.1em;position:relative;margin:0}
+.tresc ol.zadania li::before{content:counter(zad);position:absolute;left:1.1em;top:.95em;font-weight:700;color:var(--zloto)}
+.tresc h3.zadania-naglowek{margin-top:2.4em}
+.tresc .uwaga-zadania{font-family:var(--sans);font-size:.84em;color:var(--tekst2)}
+.tresc figure.zdjecie img{background:transparent}
+@media print{
+  .bez-druku{display:none!important}
+  html,body{background:#fff;color:#000}
+  .tresc{font-size:11pt;line-height:1.45}
+  .tresc table,.tresc figure,.tresc blockquote,.tresc li,.tresc section.dane{break-inside:avoid}
+  .tresc .przewijak{overflow:visible;border:none}
+  .tresc table{min-width:0;font-size:9pt}
+  .tresc th,.tresc td{white-space:normal}
+  .tresc figure img{max-width:100%}
+  .tresc figcaption,.tresc .nota{break-before:avoid}
+  .rozdzial{break-after:page}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+<script src="dane.js"></script>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#0b1d3e"></rect><text x="60" y="60" fill="#D8BC44" font-family="Georgia, serif" font-size="46" font-weight="600" text-anchor="middle" dominant-baseline="central">N</text></svg></template>
+<div style="min-height:100vh;background:var(--tlo);color:var(--tekst);font-family:var(--sans)">
+  <sc-if value="{{ spisWidoczny }}" hint-placeholder-val="{{ false }}">
+    <nav aria-label="Spis treści" class="bez-druku" style="position:fixed;top:0;bottom:0;left:0;width:19.5rem;overflow-y:auto;background:var(--tlo2);border-right:1px solid var(--linia);padding:1.7rem 1rem 3rem">
+      <button type="button" onClick="{{ wroc }}" style="display:block;width:100%;text-align:left;background:none;border:none;padding:0 .5rem 1.2rem;cursor:pointer">
+        <span style="display:block;font-family:var(--serif);font-size:1.15rem;font-weight:600">{{ tytul }}</span>
+        <span style="display:block;font-size:.74rem;color:var(--tekst2);margin-top:.2rem">{{ wersjaEtykieta }}</span>
+      </button>
+      <sc-for list="{{ spis }}" as="s" hint-placeholder-count="10">
+        <button type="button" onClick="{{ s.otworz }}" aria-current="{{ s.biezacy }}" style="{{ s.styleSpis }}">
+          <span style="min-width:1.5rem;font-size:.76rem;color:var(--akcent);padding-top:.12rem">{{ s.znak }}</span>
+          <span style="flex:1">{{ s.tytul }}</span>
+          <span style="font-size:.7rem;color:var(--tekst2)">{{ s.stan }}</span>
+        </button>
+      </sc-for>
+    </nav>
+  </sc-if>
+
+  <main style="margin-left:{{ marginLewy }};min-height:100vh;padding-bottom:calc(env(safe-area-inset-bottom) + 2rem)">
+    <sc-if value="{{ naLiscie }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:{{ szerokoscListy }};margin:0 auto;padding:0 0 2rem">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:1.2rem;padding:.9rem 1.1rem;border-bottom:1px solid var(--linia)">
+          <a href="https://wz.uw.edu.pl" target="_blank" rel="noopener" aria-label="Wydział Zarządzania, Uniwersytet Warszawski" style="display:inline-flex;align-items:center;gap:.7rem;min-height:44px;text-decoration:none;color:var(--tekst)">
+            <img class="logo-mono" src="logo-wz-uw.png" alt="WZ UW" style="display:block;height:26px;width:auto">
+            <span style="display:flex;flex-direction:column;line-height:1.25">
+              <b style="font-size:.78rem;font-weight:700;letter-spacing:-.01em">Wydział Zarządzania</b>
+              <span style="font-size:.72rem;color:var(--tekst2)">Uniwersytet Warszawski</span>
+            </span>
+          </a>
+          <img class="logo-mono" src="logo-csri.png" alt="Centrum Innowacji Odpowiedzialnych Społecznie" style="display:block;height:30px;width:auto">
+          <span style="margin-left:auto;font-size:.76rem;color:var(--tekst2)">{{ pasekGorny }}</span>
+        </div>
+
+        <div style="position:relative;overflow:hidden;background:#0b1d3e">
+          <div style="position:absolute;inset:0">{{ banerObraz }}</div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,29,62,.14) 0%,rgba(11,29,62,.46) 48%,rgba(11,29,62,.82) 100%)"></div>
+          <div style="position:relative;display:grid;gap:.4rem;padding:{{ paddingBanera }}">
+            <p style="font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#D8BC44;margin:0">Studium przypadku</p>
+            <h1 style="font-family:var(--serif);font-size:{{ rozmiarTytulu }};line-height:1.02;font-weight:600;color:#fff;margin:.1rem 0 0">{{ tytul }}</h1>
+            <p style="font-family:var(--serif);font-size:1.18rem;font-style:italic;line-height:1.4;color:rgba(255,255,255,.82);margin:.2rem 0 0;max-width:32rem">{{ podtytul }}</p>
+            <p style="font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin:.7rem 0 0">{{ wydzial }} · {{ wersjaEtykieta }}</p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:{{ kolumnyPulpitu }};gap:{{ odstepPulpitu }};align-items:start;padding:1.5rem 1.1rem 0">
+          <div class="bez-druku" style="{{ styleKolumnyNarzedzi }}">
+            <sc-if value="{{ przyciskUstawien }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ przelaczUstawienia }}" aria-expanded="{{ ustawieniaOtwarte }}" style="display:flex;align-items:center;gap:.5rem;width:100%;min-height:44px;padding:0 1rem;background:transparent;border:1px solid var(--linia);border-radius:999px;cursor:pointer;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tekst2)">Ustawienia czytania<span style="margin-left:auto">{{ ustawieniaZnak }}</span></button>
+            </sc-if>
+            <div style="{{ styleNarzedzi }}">
+            <label style="display:block">
+              <span style="display:flex;align-items:center;gap:.2rem;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tekst2);border-top:1px solid var(--tekst);padding:.7rem 0 .55rem">Szukaj<sc-if value="{{ pomoc }}" hint-placeholder-val="{{ false }}"> <span class="bez-druku" style="position:relative;display:inline-flex;vertical-align:middle"> <button type="button" onMouseEnter="{{ pomocSzukanie.wejscie }}" onMouseLeave="{{ pomocSzukanie.wyjscie }}" onFocus="{{ pomocSzukanie.wejscie }}" onBlur="{{ pomocSzukanie.wyjscie }}" onClick="{{ pomocSzukanie.przelacz }}" aria-label="Wyjaśnienie: co obejmuje szukanie" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:transparent;border:0;cursor:help;color:var(--akcent)"><span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:.72rem;font-weight:700;border:1px solid var(--akcent);border-radius:999px">?</span></button> <sc-if value="{{ pomocSzukanie.widoczny }}" hint-placeholder-val="{{ false }}"> <span role="tooltip" style="{{ pomocSzukanie.styl }}">Szukanie obejmuje rozdziały i załączniki razem z ich treścią — nie tylko tytuły. Trafienie w treści pokazuje zdanie kontekstu.</span> </sc-if> </span> </sc-if></span>
+              <input type="search" value="{{ query }}" onInput="{{ szukaj }}" placeholder="tytuł, temat, treść" style="width:100%;min-height:44px;padding:0 .1rem;font-size:.95rem;font-family:var(--sans);background:transparent;color:var(--tekst);border:0;border-bottom:1px solid var(--linia);outline-offset:2px">
+            </label>
+            
+
+            <div>
+              <span style="display:flex;align-items:center;gap:.2rem;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tekst2);border-top:1px solid var(--tekst);padding:.7rem 0 .55rem">Rozmiar tekstu<sc-if value="{{ pomoc }}" hint-placeholder-val="{{ false }}">
+                <span class="bez-druku" style="position:relative;display:inline-flex;vertical-align:middle">
+                  <button type="button" onMouseEnter="{{ pomocRozmiar.wejscie }}" onMouseLeave="{{ pomocRozmiar.wyjscie }}" onFocus="{{ pomocRozmiar.wejscie }}" onBlur="{{ pomocRozmiar.wyjscie }}" onClick="{{ pomocRozmiar.przelacz }}" aria-label="Wyjaśnienie: rozmiar tekstu" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:transparent;border:0;cursor:help;color:var(--akcent)"><span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:.72rem;font-weight:700;border:1px solid var(--akcent);border-radius:999px">?</span></button>
+                  <sc-if value="{{ pomocRozmiar.widoczny }}" hint-placeholder-val="{{ false }}">
+                    <span role="tooltip" style="{{ pomocRozmiar.styl }}">Aa− mniejszy, Aa domyślny, Aa+ większy. Skaluje tylko kolumnę tekstu rozdziału — przyciski, spis i tabele zostają tej samej wielkości.</span>
+                  </sc-if>
+                </span>
+              </sc-if></span>
+              <div style="display:flex;flex-wrap:wrap;gap:.35rem;align-items:center">
+                <div role="group" aria-label="Rozmiar tekstu" style="display:inline-flex;gap:.35rem">
+                  <sc-for list="{{ stopnieTekstu }}" as="t" hint-placeholder-count="3">
+                    <button type="button" onClick="{{ t.wybierz }}" aria-pressed="{{ t.wybrany }}" aria-label="{{ t.etykieta }}" style="{{ t.style }}">{{ t.znak }}</button>
+                  </sc-for>
+                </div>
+                <button type="button" onClick="{{ przelaczMotyw }}" aria-label="{{ motywEtykieta }}" style="min-height:44px;padding:0 .95rem;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--linia);border-radius:999px;cursor:pointer;color:var(--tekst2)">{{ motywZnak }}</button>
+                <button type="button" onClick="{{ przelaczPomoc }}" aria-pressed="{{ pomoc }}" aria-label="{{ pomocEtykieta }}" style="{{ pomocStyle }}">{{ pomocZnak }}</button>
+              </div>
+            </div>
+
+            <sc-if value="{{ planWidoczny }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <span style="display:flex;align-items:center;gap:.2rem;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tekst2);border-top:1px solid var(--tekst);padding:.7rem 0 .55rem">Tryb studiów<sc-if value="{{ pomoc }}" hint-placeholder-val="{{ false }}"> <span class="bez-druku" style="position:relative;display:inline-flex;vertical-align:middle"> <button type="button" onMouseEnter="{{ pomocTryb.wejscie }}" onMouseLeave="{{ pomocTryb.wyjscie }}" onFocus="{{ pomocTryb.wejscie }}" onBlur="{{ pomocTryb.wyjscie }}" onClick="{{ pomocTryb.przelacz }}" aria-label="Wyjaśnienie: tryb studiów i plan zajęć" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:transparent;border:0;cursor:help;color:var(--akcent)"><span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:.72rem;font-weight:700;border:1px solid var(--akcent);border-radius:999px">?</span></button> <sc-if value="{{ pomocTryb.widoczny }}" hint-placeholder-val="{{ false }}"> <span role="tooltip" style="{{ pomocTryb.styl }}">Podział na spotkania i bloki pochodzi z załącznika I: „Ile czytania przypada na jedno spotkanie”. Czas liczony przy 3,5 minuty na stronę, z powrotami do danych.</span> </sc-if> </span> </sc-if></span>
+                <div role="group" aria-label="Tryb studiów" style="display:flex;flex-wrap:wrap;gap:.35rem">
+                  <sc-for list="{{ tryby }}" as="t" hint-placeholder-count="2">
+                    <button type="button" onClick="{{ t.wybierz }}" aria-pressed="{{ t.wybrany }}" style="{{ t.style }}">{{ t.nazwa }}</button>
+                  </sc-for>
+                </div>
+                <span style="display:block;font-size:.76rem;line-height:1.45;color:var(--tekst2);margin-top:.5rem">{{ opisTrybu }} — zmienia grupowanie rozdziałów, nie treść.</span>
+              </div>
+              <div>
+                <span style="display:block;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tekst2);border-top:1px solid var(--tekst);padding:.7rem 0 .55rem">Postęp czytania</span>
+                <span style="display:block;font-size:.76rem;line-height:1.45;color:var(--tekst2);margin-bottom:.6rem">{{ podsumowaniePostepu }}</span>
+                <button type="button" onClick="{{ wyczyscPostep }}" style="min-height:44px;padding:0 .95rem;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--linia);border-radius:999px;cursor:pointer;color:var(--tekst2)">Zeruj postęp</button>
+                
+              </div>
+            </sc-if>
+            </div>
+          </div>
+
+          <div>
+        <sc-if value="{{ brakWynikow }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:.88rem;color:var(--tekst2);padding:0 0 1rem">Nic nie znaleziono dla „{{ query }}”.</p>
+        </sc-if>
+
+        <sc-if value="{{ planWidoczny }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ maInstrukcje }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{ instrukcja.otworz }}" style="display:grid;gap:.15rem;width:100%;text-align:left;background:transparent;border:1px solid var(--linia);border-radius:var(--promien);padding:.9rem 1.05rem;margin:0 0 1.8rem;cursor:pointer">
+              <span style="font-family:var(--serif);font-size:1.1rem;line-height:1.25;color:var(--tekst)">{{ instrukcja.tytul }}</span>
+              <span style="font-size:.74rem;line-height:1.4;color:var(--tekst2)">{{ instrukcja.opis }}</span>
+            </button>
+          </sc-if>
+
+          <sc-if value="{{ maCzescPierwsza }}" hint-placeholder-val="{{ false }}">
+            <span style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tekst2);margin:0 0 .6rem">Część pierwsza · firma</span>
+            <button type="button" onClick="{{ czescPierwsza.otworz }}" style="display:grid;gap:.15rem;width:100%;text-align:left;background:var(--akcent-tlo);border:none;border-radius:var(--promien);padding:.9rem 1.05rem;margin:0 0 1.8rem;cursor:pointer">
+              <span style="font-family:var(--serif);font-size:1.16rem;line-height:1.25;font-weight:600;color:var(--tekst)">{{ czescPierwsza.tytul }}</span>
+              <span style="font-size:.76rem;line-height:1.45;color:var(--tekst2)">{{ czescPierwsza.opis }}</span>
+            </button>
+          </sc-if>
+
+          <span style="display:flex;align-items:center;gap:.2rem;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tekst2);margin:0 0 .6rem">Część druga · rozdziały<sc-if value="{{ pomoc }}" hint-placeholder-val="{{ false }}">
+              <span class="bez-druku" style="position:relative;display:inline-flex;vertical-align:middle">
+                <button type="button" onMouseEnter="{{ pomocPlan.wejscie }}" onMouseLeave="{{ pomocPlan.wyjscie }}" onFocus="{{ pomocPlan.wejscie }}" onBlur="{{ pomocPlan.wyjscie }}" onClick="{{ pomocPlan.przelacz }}" aria-label="Wyjaśnienie: jak czytać plan spotkań" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:transparent;border:0;cursor:help;color:var(--akcent)"><span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:.72rem;font-weight:700;border:1px solid var(--akcent);border-radius:999px">?</span></button>
+                <sc-if value="{{ pomocPlan.widoczny }}" hint-placeholder-val="{{ false }}">
+                  <span role="tooltip" style="{{ pomocPlan.styl }}">Jeden wiersz to jedno spotkanie: rozdziały do przeczytania przed tymi zajęciami, czas czytania i liczba poleceń. Przeczytane rozdziały mają złoty pasek postępu i podpis „Przeczytany”.</span>
+                </sc-if>
+              </span>
+            </sc-if></span>
+          <div style="display:grid;gap:0;border-top:1px solid var(--linia)">
+            <sc-for list="{{ spotkania }}" as="s" hint-placeholder-count="12">
+              <div style="{{ s.style }}">
+                <div style="display:grid;gap:.15rem;padding:.1rem 0 0">
+                  <span style="font-family:var(--serif);font-size:2.7rem;line-height:.92;font-weight:600;color:{{ s.kolorNumeru }}">{{ s.numer }}</span>
+                  <span style="{{ s.styleEtykiety }}">{{ s.etykieta }}</span>
+                </div>
+                <div style="display:grid;gap:.45rem">
+                  <sc-for list="{{ s.rozdzialy }}" as="r" hint-placeholder-count="2">
+                    <button type="button" onClick="{{ r.otworz }}" style="display:grid;grid-template-columns:1.6rem 1fr;gap:.6rem;align-items:baseline;width:100%;min-height:44px;text-align:left;background:none;border:none;padding:.35rem 0;cursor:pointer">
+                      <span style="font-size:.9rem;font-weight:700;color:var(--akcent)">{{ r.numer }}</span>
+                      <span style="display:block">
+                        <span style="display:block;font-family:var(--serif);font-size:1.1rem;line-height:1.25;font-weight:600">{{ r.tytul }}</span>
+                        <span style="display:block;font-size:.74rem;line-height:1.4;color:var(--tekst2);margin-top:.12rem">{{ r.opis }}</span>
+                        <sc-if value="{{ r.pokazPasek }}" hint-placeholder-val="{{ false }}">
+                          <span style="display:flex;align-items:center;flex-wrap:nowrap;gap:.6rem;margin-top:.45rem;max-width:20rem">
+                            <span style="flex:1;height:2px;background:var(--linia);overflow:hidden">
+                              <span style="display:block;height:2px;width:{{ r.procentTekst }};background:var(--postep)"></span>
+                            </span>
+                            <span style="font-size:.68rem;white-space:nowrap;color:var(--tekst2)">{{ r.stan }}</span>
+                          </span>
+                        </sc-if>
+                      </span>
+                    </button>
+                  </sc-for>
+                  <span style="font-size:.7rem;color:var(--tekst2)">{{ s.czas }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <p style="font-size:.76rem;line-height:1.5;color:var(--tekst2);margin:1.1rem .2rem 0">{{ notaPlanu }}</p>
+        </sc-if>
+
+        <div style="display:grid;gap:.6rem">
+          <sc-for list="{{ pozycje }}" as="p" hint-placeholder-count="8">
+            <button type="button" onClick="{{ p.otworz }}" style="display:grid;grid-template-columns:auto 1fr;gap:.9rem;width:100%;text-align:left;background:var(--karta);border:1px solid var(--linia);border-radius:var(--promien);padding:.95rem 1rem;cursor:pointer;transition:border-color .15s">
+              <span style="font-size:1.05rem;font-weight:700;color:var(--akcent);min-width:1.7rem;padding-top:.1rem">{{ p.znak }}</span>
+              <span style="display:block">
+                <span style="display:block;font-family:var(--serif);font-size:1.08rem;line-height:1.3;font-weight:600">{{ p.tytul }}</span>
+                <span style="display:block;font-size:.78rem;line-height:1.4;color:var(--tekst2);margin-top:.25rem">{{ p.opis }}</span>
+                <sc-if value="{{ p.kontekst }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:block;font-family:var(--serif);font-size:.86rem;line-height:1.4;color:var(--tekst2);margin-top:.45rem;padding-left:.6rem;border-left:2px solid var(--linia)">…{{ p.kontekst }}…</span>
+                </sc-if>
+                <sc-if value="{{ p.pokazPasek }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:flex;align-items:center;flex-wrap:nowrap;gap:.6rem;margin-top:.6rem;max-width:22rem">
+                    <span style="flex:1;height:2px;background:var(--linia);overflow:hidden">
+                      <span style="display:block;height:2px;width:{{ p.procentTekst }};background:var(--postep)"></span>
+                    </span>
+                    <span style="font-size:.7rem;white-space:nowrap;color:var(--tekst2)">{{ p.stan }}</span>
+                  </span>
+                </sc-if>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:1.8rem">
+          <button type="button" onClick="{{ przelaczZalaczniki }}" aria-expanded="{{ zalOtwarte }}" style="display:flex;align-items:center;gap:.6rem;width:100%;min-height:44px;text-align:left;background:none;border:none;border-top:1px solid var(--linia);padding:1rem .2rem;cursor:pointer">
+            <span style="font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tekst2)">Część trzecia · załączniki ({{ liczbaZalacznikow }})</span>
+            <span style="font-size:.78rem;color:var(--tekst2);margin-left:auto">{{ zalZnak }}</span>
+          </button>
+          <sc-if value="{{ zalOtwarte }}" hint-placeholder-val="{{ true }}">
+            <sc-if value="{{ pomoc }}" hint-placeholder-val="{{ false }}">
+              <span class="bez-druku" style="position:relative;display:inline-flex;vertical-align:middle">
+                <button type="button" onMouseEnter="{{ pomocZalaczniki.wejscie }}" onMouseLeave="{{ pomocZalaczniki.wyjscie }}" onFocus="{{ pomocZalaczniki.wejscie }}" onBlur="{{ pomocZalaczniki.wyjscie }}" onClick="{{ pomocZalaczniki.przelacz }}" aria-label="Wyjaśnienie: kiedy czytać załączniki" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:transparent;border:0;cursor:help;color:var(--akcent)"><span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:.72rem;font-weight:700;border:1px solid var(--akcent);border-radius:999px">?</span></button>
+                <sc-if value="{{ pomocZalaczniki.widoczny }}" hint-placeholder-val="{{ false }}">
+                  <span role="tooltip" style="{{ pomocZalaczniki.styl }}">Załączniki czyta się tylko wtedy, gdy rozdział do nich odsyła. W rozdziale są wypisane u góry i podlinkowane w tekście.</span>
+                </sc-if>
+              </span>
+            </sc-if>
+            <div style="display:grid;gap:.4rem">
+              <sc-for list="{{ zalaczniki }}" as="z" hint-placeholder-count="11">
+                <button type="button" onClick="{{ z.otworz }}" style="display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:baseline;width:100%;text-align:left;background:var(--karta);border:1px solid var(--linia);border-radius:var(--promien);padding:.8rem 1rem;cursor:pointer">
+                  <span style="font-size:.95rem;font-weight:700;color:var(--akcent);min-width:1.7rem">{{ z.znak }}</span>
+                  <span style="font-family:var(--serif);font-size:1rem;line-height:1.3">{{ z.tytul }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ wRozdziale }}" hint-placeholder-val="{{ false }}">
+      <div class="rozdzial">
+        <div class="bez-druku" style="max-width:{{ szerokoscKolumny }};margin:0 auto">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:1.2rem;padding:.8rem 1.1rem;border-bottom:1px solid var(--linia)">
+          <a href="https://wz.uw.edu.pl" target="_blank" rel="noopener" aria-label="Wydział Zarządzania, Uniwersytet Warszawski" style="display:inline-flex;align-items:center;gap:.7rem;min-height:44px;text-decoration:none;color:var(--tekst)">
+            <img class="logo-mono" src="logo-wz-uw.png" alt="WZ UW" style="display:block;height:26px;width:auto">
+            <span style="display:flex;flex-direction:column;line-height:1.25">
+              <b style="font-size:.78rem;font-weight:700;letter-spacing:-.01em">Wydział Zarządzania</b>
+              <span style="font-size:.72rem;color:var(--tekst2)">Uniwersytet Warszawski</span>
+            </span>
+          </a>
+          <img class="logo-mono" src="logo-csri.png" alt="Centrum Innowacji Odpowiedzialnych Społecznie" style="display:block;height:30px;width:auto">
+          <span style="margin-left:auto;font-size:.76rem;color:var(--tekst2)">{{ pasekGorny }}</span>
+        </div>
+        </div>
+        <sc-if value="{{ pasekMobilny }}" hint-placeholder-val="{{ false }}">
+          <div class="bez-druku" style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.4rem;background:var(--tlo);border-bottom:1px solid var(--linia);padding:calc(env(safe-area-inset-top) + .35rem) .5rem .35rem;transform:{{ pasekTransform }};transition:transform .25s cubic-bezier(.32,.72,0,1)">
+            <button type="button" onClick="{{ wroc }}" aria-label="Wróć do spisu rozdziałów" style="min-width:44px;min-height:44px;background:none;border:none;font-size:1.15rem;cursor:pointer;color:var(--akcent)">←</button>
+            <span style="flex:1;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tytulBiezacy }}</span>
+            <button type="button" onClick="{{ udostepnij }}" aria-label="Udostępnij link do rozdziału" style="min-width:44px;min-height:44px;background:none;border:none;font-size:.78rem;cursor:pointer;color:var(--tekst2)">Link</button>
+          </div>
+        </sc-if>
+        <article style="max-width:{{ szerokoscKolumny }};margin:0 auto;padding:1.6rem 1.1rem 3rem">
+          <button type="button" onClick="{{ wroc }}" class="bez-druku" aria-label="Wróć na stronę główną" style="display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:0 1rem 0 .8rem;margin:0 0 1.2rem;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid var(--linia);border-radius:999px;cursor:pointer;color:var(--tekst2)"><span aria-hidden="true" style="font-size:.95rem;line-height:1">←</span>Strona główna</button>
+          <sc-if value="{{ maPowrotDoRozdzialu }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{ doRozdzialu }}" class="bez-druku" style="display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:0 1rem 0 .8rem;margin:0 0 1.2rem .45rem;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--akcent-tlo);border:none;border-radius:999px;cursor:pointer;color:var(--akcent)"><span aria-hidden="true" style="font-size:.95rem;line-height:1">←</span>{{ powrotDoRozdzialuTytul }}</button>
+          </sc-if>
+          <p style="display:flex;align-items:center;gap:.2rem;font-size:.8rem;color:var(--tekst2);margin:0 0 .5rem">{{ nadtytul }}<sc-if value="{{ pomoc }}" hint-placeholder-val="{{ false }}"> <span class="bez-druku" style="position:relative;display:inline-flex;vertical-align:middle"> <button type="button" onMouseEnter="{{ pomocRozdzial.wejscie }}" onMouseLeave="{{ pomocRozdzial.wyjscie }}" onFocus="{{ pomocRozdzial.wejscie }}" onBlur="{{ pomocRozdzial.wyjscie }}" onClick="{{ pomocRozdzial.przelacz }}" aria-label="Wyjaśnienie: budowa rozdziału i pobieranie danych" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:transparent;border:0;cursor:help;color:var(--akcent)"><span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:.72rem;font-weight:700;border:1px solid var(--akcent);border-radius:999px">?</span></button> <sc-if value="{{ pomocRozdzial.widoczny }}" hint-placeholder-val="{{ false }}"> <span role="tooltip" style="{{ pomocRozdzial.styl }}">Rozdział ma trzy części: opis sytuacji, wyróżnioną sekcję „Dane rozdziału” i polecenia na końcu. Przy każdej tabeli są przyciski „Kopiuj” (wkleja się w Excelu jako komórki) i „CSV”; pod rysunkami „Pobierz PNG” i powiększenie. Czytnik zapisuje, gdzie skończyłeś, i wraca w to miejsce.</span> </sc-if> </span> </sc-if></p>
+          <h2 style="font-family:var(--serif);font-size:1.85rem;line-height:1.18;font-weight:600;margin:0 0 1.4rem">{{ tytulBiezacy }}</h2>
+          <sc-if value="{{ maPrzywolane }}" hint-placeholder-val="{{ false }}">
+            <div class="bez-druku" style="margin:0 0 1.6rem">
+              <span style="display:block;font-size:.8rem;color:var(--tekst2);margin-bottom:.6rem">Załączniki do tego rozdziału</span>
+              <div style="display:flex;flex-wrap:wrap;gap:.45rem">
+              <sc-for list="{{ przywolane }}" as="z" hint-placeholder-count="2">
+                <button type="button" onClick="{{ z.otworz }}" style="display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:0 .95rem;background:var(--akcent-tlo);border:none;border-radius:999px;cursor:pointer;color:var(--tekst)">
+                  <span style="font-weight:700;color:var(--akcent);font-size:.78rem">{{ z.litera }}</span>
+                  <span style="font-size:.8rem">{{ z.tytul }}</span>
+                </button>
+              </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          
+          <div class="tresc" style="font-size:{{ rozmiarTekstu }}"></div>
+          <div class="bez-druku" aria-hidden="true" style="position:fixed;left:0;right:0;top:0;height:2px;background:transparent;z-index:6"><span style="display:block;height:2px;width:{{ postepBiezacy }};background:var(--postep)"></span></div>
+          <sc-if value="{{ tekstZabezpieczony }}" hint-placeholder-val="{{ false }}">
+            <p class="bez-druku" style="font-size:.76rem;line-height:1.5;color:var(--tekst2);margin:2.2rem 0 0">Tekst rozdziału jest zabezpieczony przed kopiowaniem. Dane do rachunku pobierzesz przyciskami „Kopiuj” i „CSV” przy każdej tabeli.</p>
+          </sc-if>
+          <div class="bez-druku" style="display:flex;flex-wrap:wrap;gap:.5rem;margin:1.6rem 0;padding-top:1.2rem;border-top:1px solid var(--linia)">
+            <sc-if value="{{ maTabele }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ pobierzDaneRozdzialu }}" style="min-height:44px;padding:0 1.1rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--linia);border-radius:999px;cursor:pointer;color:var(--tekst)">Pobierz dane rozdziału</button>
+            </sc-if>
+            <button type="button" onClick="{{ przelaczPomoc }}" aria-pressed="{{ pomoc }}" aria-label="{{ pomocEtykieta }}" style="{{ pomocStyle }}">{{ pomocZnak }}</button>
+            <button type="button" onClick="{{ przelaczPrzeczytany }}" aria-pressed="{{ jestPrzeczytany }}" style="{{ stylPrzeczytany }}">{{ znakPrzeczytany }}</button>
+            <button type="button" onClick="{{ drukuj }}" style="min-height:44px;padding:0 1.1rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--linia);border-radius:999px;cursor:pointer;color:var(--tekst)">Drukuj rozdział</button>
+            <button type="button" onClick="{{ udostepnij }}" style="min-height:44px;padding:0 1.1rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--linia);border-radius:999px;cursor:pointer;color:var(--tekst)">Udostępnij</button>
+          </div>
+          <nav aria-label="Nawigacja między rozdziałami" class="bez-druku" style="display:grid;gap:.5rem">
+            <button type="button" onClick="{{ wroc }}" style="display:flex;align-items:center;gap:.5rem;width:100%;min-height:44px;text-align:left;background:transparent;border:1px solid var(--linia);border-radius:var(--promien);padding:.85rem 1rem;cursor:pointer;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tekst2)"><span aria-hidden="true" style="font-size:.95rem;line-height:1">←</span>Strona główna</button>
+            <sc-if value="{{ maPoprzedni }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ doPoprzedniego }}" style="display:block;width:100%;text-align:left;background:var(--karta);border:1px solid var(--linia);border-radius:var(--promien);padding:.85rem 1rem;cursor:pointer">
+                <span style="display:block;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--tekst2)">Poprzedni</span>
+                <span style="display:block;font-family:var(--serif);font-size:1rem;margin-top:.2rem">{{ poprzedniTytul }}</span>
+              </button>
+            </sc-if>
+            <sc-if value="{{ maNastepny }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ doNastepnego }}" style="display:block;width:100%;text-align:left;background:var(--karta);border:1px solid var(--linia);border-radius:var(--promien);padding:.85rem 1rem;cursor:pointer">
+                <span style="display:block;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--tekst2)">Następny</span>
+                <span style="display:block;font-family:var(--serif);font-size:1rem;margin-top:.2rem">{{ nastepnyTytul }}</span>
+              </button>
+            </sc-if>
+          </nav>
+        </article>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ zoom }}" hint-placeholder-val="{{ false }}">
+    <div class="bez-druku" role="dialog" aria-label="Powiększony rysunek" style="position:fixed;inset:0;z-index:40;background:rgba(8,23,50,.94);overflow:auto;-webkit-overflow-scrolling:touch">
+      <div onClick="{{ zamknijZoom }}" style="min-height:100%;display:flex;align-items:center;justify-content:center;padding:3.6rem 1rem 1rem;cursor:zoom-out">{{ zoomObraz }}</div>
+      <p style="position:fixed;left:1rem;bottom:calc(env(safe-area-inset-bottom) + 1rem);margin:0;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55)">{{ zoomPodpowiedz }}</p>
+      <button type="button" onClick="{{ zoomSkala }}" style="position:fixed;left:1rem;top:calc(env(safe-area-inset-top) + .6rem);min-height:44px;padding:0 1rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:999px;cursor:pointer">{{ zoomSkalaZnak }}</button>
+      <button type="button" onClick="{{ zamknijZoom }}" aria-label="Zamknij powiększenie" style="position:fixed;top:calc(env(safe-area-inset-top) + .6rem);right:.6rem;min-width:44px;min-height:44px;background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:999px;cursor:pointer">✕</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ zaslona }}" hint-placeholder-val="{{ false }}">
+    <div class="bez-druku" role="presentation" style="position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:center;justify-content:center;padding:2rem">
+      <span style="font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#3a3a3a;text-align:center">Ekran zasłonięty · wróć do okna, żeby czytać</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ komunikat }}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="bez-druku" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 1.2rem);z-index:50;background:var(--tekst);color:var(--tlo);font-size:.82rem;padding:.7rem 1.1rem;border-radius:999px">{{ komunikat }}</div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;blokadaKopiowania&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Zabezpieczenia&quot;},&quot;zaslonaPrzyUtracieOgniska&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Zabezpieczenia&quot;},&quot;pokazPlanZajec&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Ekran startowy&quot;}}">
+class Component extends DCLogic {
+  state = {
+    dane: null,
+    widok: 'lista',
+    biezacy: null,
+    wariant: 'H',
+    tekst: (() => { try { return parseInt(localStorage.getItem('nordvia.tekst') || '1', 10); } catch (e) { return 1; } })(),
+    motyw: (() => {
+      try {
+        const z = localStorage.getItem('nordvia.motyw');
+        if (z) return z;
+      } catch (e) {}
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'ciemny' : 'jasny';
+    })(),
+    szeroki: !!(window.matchMedia && window.matchMedia('(min-width: 900px)').matches),
+    szerokiPlus: !!(window.matchMedia && window.matchMedia('(min-width: 1180px)').matches),
+    query: '',
+    tryb: (() => { try { return parseInt(localStorage.getItem('nordvia.tryb') || '0', 10) || 0; } catch (e) { return 0; } })(),
+    pomoc: (() => { try { return localStorage.getItem('nordvia.pomoc') !== 'nie'; } catch (e) { return true; } })(),
+    ustawieniaOtwarte: false,
+    dymek: null,
+    kotwica: null,
+    procentBiezacy: 0,
+    zalOtwarte: !!(window.matchMedia && window.matchMedia('(min-width: 900px)').matches),
+    zoom: null,
+    pasek: true,
+    komunikat: null,
+    postep: (() => { try { return JSON.parse(localStorage.getItem('nordvia.postep')) || {}; } catch (e) { return {}; } })()
+  };
+
+  componentDidMount() {
+    this.stosujMotyw();
+    this.mq = window.matchMedia('(min-width: 900px)');
+    this.naMq = () => this.setState({ szeroki: this.mq.matches, zalOtwarte: this.state.zalOtwarte || this.mq.matches });
+    this.mq.addEventListener ? this.mq.addEventListener('change', this.naMq) : this.mq.addListener(this.naMq);
+    this.mq2 = window.matchMedia('(min-width: 1180px)');
+    this.naMq2 = () => this.setState({ szerokiPlus: this.mq2.matches });
+    this.mq2.addEventListener ? this.mq2.addEventListener('change', this.naMq2) : this.mq2.addListener(this.naMq2);
+    /* Stan startowy czytamy przy konstrukcji, a okno dochodzi do docelowej szerokości
+       już po niej — bez tego wyrównania nieaktualne „wąskie” zostaje na całą sesję. */
+    this.wyrownajSzerokosc();
+    this.naZmianaRozmiaru = () => this.wyrownajSzerokosc();
+    window.addEventListener('resize', this.naZmianaRozmiaru);
+    window.addEventListener('orientationchange', this.naZmianaRozmiaru);
+    /* Ramka podglądu potrafi dojść do rozmiaru bez zdarzenia resize. */
+    if (window.ResizeObserver) {
+      this.obserwator = new ResizeObserver(() => this.wyrownajSzerokosc());
+      this.obserwator.observe(document.documentElement);
+    }
+    this.naHash = () => this.zHasza();
+    window.addEventListener('hashchange', this.naHash);
+    /* Dymek jest przyklejony do ekranu, więc przy przewijaniu odjeżdża od kotwicy — zamykamy. */
+    this.naScroll = () => { if (this.state.dymek) this.setState({ dymek: null }); this.obsluzPrzewijanie(); };
+    window.addEventListener('scroll', this.naScroll, { passive: true });
+    this.naPagehide = () => this.zapiszPostep(true);
+    window.addEventListener('pagehide', this.naPagehide);
+    this.naKlawisz = (e) => {
+      if (e.key !== 'Escape') return;
+      if (this.state.zoom) this.setState({ zoom: null, zoomPelna: false });
+      else if (this.state.dymek) this.setState({ dymek: null });
+    };
+    window.addEventListener('keydown', this.naKlawisz);
+    this.zegar = setInterval(() => this.zapiszPostep(false), 3000);
+    this.blokujKopiowanie();
+    this.pilnujOgniska();
+    this.zaladujDane(0);
+    this.obsluzServiceWorker();
+  }
+
+  wyrownajSzerokosc() {
+    if (!this.mq || !this.mq2) return;
+    const szeroki = this.mq.matches, szerokiPlus = this.mq2.matches;
+    if (szeroki === this.state.szeroki && szerokiPlus === this.state.szerokiPlus) return;
+    this.setState({ szeroki, szerokiPlus, zalOtwarte: this.state.zalOtwarte || szeroki });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('hashchange', this.naHash);
+    window.removeEventListener('scroll', this.naScroll);
+    window.removeEventListener('pagehide', this.naPagehide);
+    window.removeEventListener('keydown', this.naKlawisz);
+    if (this.mq) this.mq.removeEventListener ? this.mq.removeEventListener('change', this.naMq) : this.mq.removeListener(this.naMq);
+    if (this.mq2) this.mq2.removeEventListener ? this.mq2.removeEventListener('change', this.naMq2) : this.mq2.removeListener(this.naMq2);
+    if (this.naZmianaRozmiaru) {
+      window.removeEventListener('resize', this.naZmianaRozmiaru);
+      window.removeEventListener('orientationchange', this.naZmianaRozmiaru);
+    }
+    if (this.obserwator) this.obserwator.disconnect();
+    clearInterval(this.zegar);
+    if (this.naBlokade) ['copy', 'cut', 'contextmenu', 'dragstart'].forEach(t => document.removeEventListener(t, this.naBlokade));
+    if (this.naSkrot) document.removeEventListener('keydown', this.naSkrot);
+    if (this.naBlur) { window.removeEventListener('blur', this.naBlur); window.removeEventListener('focus', this.naFocus); document.removeEventListener('visibilitychange', this.naWidocznosc); }
+  }
+
+  componentDidUpdate() {
+    this.stosujMotyw();
+    this.wstrzyknij();
+  }
+
+  /* Bufor offline włączamy tylko dla wdrożonego pliku (index.html bez parametrów).
+     W podglądzie i na hostingu współdzielonym rejestrację cofamy i czyścimy pamięć,
+     żeby nie serwować starego builda ani plików, które nas nie dotyczą. */
+  obsluzServiceWorker() {
+    if (!('serviceWorker' in navigator) || location.protocol.indexOf('http') !== 0) return;
+    const plik = location.pathname.split('/').pop() || '';
+    const wdrozenie = !location.search && (plik === '' || plik === 'index.html');
+    if (wdrozenie) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+      return;
+    }
+    navigator.serviceWorker.getRegistrations()
+      .then(rej => rej.forEach(r => { if (/sw\.js/.test((r.active && r.active.scriptURL) || '')) r.unregister(); }))
+      .catch(() => {});
+    if (window.caches && caches.keys) {
+      caches.keys().then(k => k.filter(n => n.indexOf('nordvia') === 0).forEach(n => caches.delete(n))).catch(() => {});
+    }
+  }
+
+  /* ---------- dane ---------- */
+
+  zaladujDane(proba) {
+    if (this.state.dane) return;
+    const osadzony = document.getElementById('dane');
+    if (window.KEJS) return this.ustawDane(window.KEJS);
+    if (osadzony && osadzony.textContent.trim()) {
+      try { return this.ustawDane(JSON.parse(osadzony.textContent)); } catch (e) {}
+    }
+    /* Dane przychodzą z dane.js w helmecie. Fetch to zapas dla wdrożeń bez tego pliku —
+       odpalamy go dopiero, gdy skrypt naprawdę nie doszedł, żeby nie zgłaszać 404 w konsoli. */
+    if (proba === 20) {
+      fetch('kejs.json').then(r => (r.ok ? r.json() : null)).then(d => d && this.ustawDane(d)).catch(() => {});
+    }
+    if (proba < 80) setTimeout(() => this.zaladujDane(proba + 1), 120);
+  }
+
+  ustawDane(dane) {
+    if (this.state.dane) return;
+    this.indeks = {};
+    this.tekstPelny = {};
+    const el = document.createElement('div');
+    this.pozycjeDane(dane).forEach(p => {
+      this.indeks[p.id] = p;
+      el.innerHTML = this.htmlPozycji(p, 'H', dane) + (p.typ === 'rozdzial' ? this.htmlPozycji(p, 'A', dane) : '');
+      this.tekstPelny[p.id] = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    });
+    el.innerHTML = '';
+    this.setState({ dane }, () => this.zHasza());
+  }
+
+  pozycjeDane(dane) {
+    const lista = [];
+    if (dane.czesc_wstepna) lista.push({ id: dane.czesc_wstepna.id, typ: 'sekcje', tytul: dane.czesc_wstepna.tytul, zrodlo: dane.czesc_wstepna, znak: '•' });
+    if (dane.firma) lista.push({ id: dane.firma.id, typ: 'sekcje', tytul: dane.firma.tytul, zrodlo: dane.firma, znak: '•' });
+    (dane.rozdzialy || []).forEach(r => lista.push({ id: r.id, typ: 'rozdzial', tytul: r.tytul, zrodlo: r, znak: String(r.numer) }));
+    (dane.zalaczniki || []).forEach(z => lista.push({ id: z.id, typ: 'zalacznik', tytul: z.tytul, zrodlo: z, znak: z.litera }));
+    return lista;
+  }
+
+  get pozycjeWszystkie() {
+    return this.state.dane ? this.pozycjeDane(this.state.dane) : [];
+  }
+
+  htmlPozycji(p, wariant, dane) {
+    const z = p.zrodlo;
+    if (p.typ === 'rozdzial') return z.tresc[wariant] || z.tresc.H || z.tresc.A || '';
+    if (p.typ === 'zalacznik') return z.html || '';
+    return (z.sekcje || []).map(s => (s.tytul && s.tytul !== p.tytul ? '<h3>' + s.tytul + '</h3>' : '') + s.html).join('');
+  }
+
+  /* Plan zajęć bierzemy wprost z załącznika I — nic nie dopisujemy. */
+  plan() {
+    if (this.planCache) return this.planCache;
+    const d = this.state.dane;
+    if (!d) return [];
+    const zi = (d.zalaczniki || []).filter(z => z.id === 'zal-I')[0];
+    if (!zi) return [];
+    const el = document.createElement('div');
+    el.innerHTML = zi.html;
+    const naglowki = Array.prototype.slice.call(el.querySelectorAll('p > strong')).map(x => x.textContent.trim());
+    const noty = Array.prototype.slice.call(el.querySelectorAll('p'))
+      .map(p => p.textContent.trim())
+      .filter(t => t.indexOf('Trzynaste') === 0 || t.indexOf('Przed pierwszym blokiem') === 0);
+    this.planCache = Array.prototype.slice.call(el.querySelectorAll('table')).map((t, i) => ({
+      nazwa: (naglowki[i] || '').split('—')[0].trim(),
+      opis: (naglowki[i] || '').split('—').slice(1).join('—').trim(),
+      etykieta: t.rows[0] ? (t.rows[0].cells[0].textContent || '').trim() : '',
+      nota: noty[i] || '',
+      grupy: Array.prototype.slice.call(t.rows).slice(1).map(tr => {
+        const k = Array.prototype.slice.call(tr.cells).map(c => (c.textContent || '').replace(/\s+/g, ' ').trim());
+        const numery = [];
+        (k[1] || '').split('+').forEach(cz => {
+          const zakres = /(\d+)\s*[–-]\s*(\d+)/.exec(cz);
+          if (zakres) { for (let n = +zakres[1]; n <= +zakres[2]; n++) numery.push(n); return; }
+          const jeden = /(\d+)/.exec(cz);
+          if (jeden) numery.push(+jeden[1]);
+        });
+        return { numer: k[0], czas: k[3] ? k[3] + ' · ' + k[2] + ' str.' : '', numery };
+      })
+    }));
+    return this.planCache;
+  }
+
+  /* Dymek pokazujemy przy najechaniu i ogniskowaniu; tapnięcie przełącza (telefon).
+     Pozycję liczymy od kotwicy i przycinamy do ekranu — stałe right:0 albo left:0
+     wypycha dymek za krawędź, bo kotwica stoi w różnych miejscach różnych układów. */
+  dymek(nazwa) {
+    const otwarty = this.state.dymek === nazwa;
+    return {
+      widoczny: otwarty,
+      styl: otwarty ? this.stylDymka() : 'display:none',
+      wejscie: (e) => this.otworzDymek(nazwa, e),
+      wyjscie: () => { if (this.state.dymek === nazwa) this.setState({ dymek: null }); },
+      przelacz: (e) => { if (otwarty) this.setState({ dymek: null }); else this.otworzDymek(nazwa, e); }
+    };
+  }
+
+  otworzDymek(nazwa, e) {
+    const el = e && (e.currentTarget || e.target);
+    const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+    this.setState({
+      dymek: nazwa,
+      kotwica: r ? { x: r.left, y: r.bottom, w: r.width } : null
+    });
+  }
+
+  stylDymka() {
+    const margines = 12;
+    const dostepne = document.documentElement.clientWidth;
+    const szer = Math.min(368, dostepne - margines * 2);
+    const k = this.state.kotwica;
+    let x = k ? k.x + k.w / 2 - szer / 2 : margines;
+    x = Math.max(margines, Math.min(x, dostepne - szer - margines));
+    const y = k ? k.y - 2 : 56;
+    return 'position:fixed;top:' + Math.round(y) + 'px;left:' + Math.round(x) + 'px;width:' + Math.round(szer) +
+      'px;z-index:45;font-size:.78rem;line-height:1.5;font-weight:400;letter-spacing:0;text-transform:none;text-align:left;' +
+      'color:var(--tekst2);background:var(--karta);border:1px solid var(--linia);border-radius:var(--promien);' +
+      'padding:.8rem .95rem;box-shadow:0 8px 24px rgba(8,23,50,.16)';
+  }
+
+  /* Postęp zapisuje się sam z przewijania, ale student musi móc go poprawić ręcznie. */
+  przelaczPrzeczytany() {
+    const id = this.state.biezacy;
+    if (!id) return;
+    const postep = Object.assign({}, this.state.postep);
+    const stare = postep[id] || { procent: 0, przeczytany: false };
+    const przeczytany = !stare.przeczytany;
+    postep[id] = { procent: przeczytany ? 100 : 0, przeczytany };
+    this.przeczytanyTeraz = przeczytany;
+    this.biezacyProcent = postep[id].procent;
+    this.zapisz('nordvia.postep', JSON.stringify(postep));
+    this.setState({ postep });
+    this.pokaz(przeczytany ? 'Oznaczono jako przeczytany' : 'Oznaczono jako nieprzeczytany');
+  }
+
+  wyczyscPostep() {
+    this.przeczytanyTeraz = false;
+    this.biezacyProcent = 0;
+    this.zapisz('nordvia.postep', '{}');
+    this.setState({ postep: {}, procentBiezacy: 0 });
+    this.pokaz('Postęp czytania wyzerowany');
+  }
+
+  przelaczPomoc() {
+    const pomoc = !this.state.pomoc;
+    this.zapisz('nordvia.pomoc', pomoc ? 'tak' : 'nie');
+    this.setState({ pomoc });
+  }
+
+  ustawTryb(i) {
+    this.zapisz('nordvia.tryb', String(i));
+    this.setState({ tryb: i });
+  }
+
+  /* ---------- nawigacja ---------- */
+
+  zHasza() {
+    if (!this.state.dane) return;
+    const h = (location.hash || '').replace(/^#/, '');
+    if (!h) { this.setState({ widok: 'lista', biezacy: null }); return; }
+    const czesci = h.split('?');
+    const id = czesci[0];
+    if (!this.indeks[id]) return;
+    const teraz = this.state.biezacy ? this.indeks[this.state.biezacy] : null;
+    if (this.indeks[id].typ === 'zalacznik') {
+      if (teraz && teraz.typ !== 'zalacznik') this.skokZ = teraz.id;
+    } else this.skokZ = null;
+    this.doGory = true;
+    this.setState({ widok: 'rozdzial', biezacy: id, query: '' });
+  }
+
+  otworz(id) {
+    this.zapiszPostep(true);
+    this.doGory = true;
+    /* Skok z rozdziału do załącznika zapamiętujemy, żeby dało się wrócić w to samo miejsce. */
+    const cel = this.indeks && this.indeks[id];
+    const teraz = this.indeks && this.state.biezacy ? this.indeks[this.state.biezacy] : null;
+    if (cel && cel.typ === 'zalacznik' && teraz && teraz.typ !== 'zalacznik') this.skokZ = teraz.id;
+    else if (!cel || cel.typ !== 'zalacznik') this.skokZ = null;
+    if (('#' + id) === location.hash) { this.setState({ widok: 'rozdzial', biezacy: id }); return; }
+    location.hash = id;
+  }
+
+  wroc() {
+    this.zapiszPostep(true);
+    const y = this.pozycjaListy || 0;
+    if (location.hash) {
+      history.pushState ? history.pushState(null, '', location.pathname + location.search) : (location.hash = '');
+      this.setState({ widok: 'lista', biezacy: null }, () => window.scrollTo(0, y));
+    } else {
+      this.setState({ widok: 'lista', biezacy: null });
+    }
+  }
+
+  /* ---------- ustawienia ---------- */
+
+  stosujMotyw() {
+    const el = document.documentElement;
+    if (el.getAttribute('data-motyw') !== this.state.motyw) el.setAttribute('data-motyw', this.state.motyw);
+    const blokada = (this.props.blokadaKopiowania ?? true) ? 'zablokowane' : 'wolne';
+    if (el.getAttribute('data-kopiowanie') !== blokada) el.setAttribute('data-kopiowanie', blokada);
+  }
+
+  /* Blokada kopiowania narracji. Przyciski „Kopiuj” i „CSV” przy tabelach
+     działają dalej — dane są do liczenia, tekst do czytania. */
+  wTresci(cel) {
+    return !!(cel && cel.closest && cel.closest('.tresc'));
+  }
+
+  blokujKopiowanie() {
+    if (!(this.props.blokadaKopiowania ?? true)) return;
+    this.naBlokade = (e) => {
+      if (!(this.props.blokadaKopiowania ?? true)) return;
+      if (!this.wTresci(e.target)) return;
+      if (this.wlasnyEksport) return;
+      e.preventDefault();
+      if (e.type === 'copy' || e.type === 'cut') this.pokaz('Tekst kejsu jest zabezpieczony — dane pobierz przyciskiem „Kopiuj” lub „CSV”');
+    };
+    ['copy', 'cut', 'contextmenu', 'dragstart'].forEach(t => document.addEventListener(t, this.naBlokade));
+    this.naSkrot = (e) => {
+      if (!(this.props.blokadaKopiowania ?? true)) return;
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const k = (e.key || '').toLowerCase();
+      if (k !== 'c' && k !== 'x' && k !== 'a') return;
+      const aktywny = document.activeElement;
+      if (aktywny && /^(input|textarea|select)$/i.test(aktywny.tagName)) return;
+      if (this.state.widok !== 'rozdzial') return;
+      e.preventDefault();
+    };
+    document.addEventListener('keydown', this.naSkrot);
+  }
+
+  /* Zasłona przy utracie ogniska. Nie wykrywa zrzutu ekranu — przeglądarka tego nie
+     zgłasza — ale narzędzia do zrzutów zabierają ognisko okna, więc łapie ich część. */
+  pilnujOgniska() {
+    const zaslon = (tak) => {
+      if (!(this.props.zaslonaPrzyUtracieOgniska ?? false)) { if (this.state.zaslona) this.setState({ zaslona: false }); return; }
+      if (this.state.widok !== 'rozdzial') { if (this.state.zaslona) this.setState({ zaslona: false }); return; }
+      if (this.state.zaslona !== tak) this.setState({ zaslona: tak });
+    };
+    this.naBlur = () => zaslon(true);
+    this.naFocus = () => zaslon(false);
+    this.naWidocznosc = () => zaslon(document.hidden);
+    window.addEventListener('blur', this.naBlur);
+    window.addEventListener('focus', this.naFocus);
+    document.addEventListener('visibilitychange', this.naWidocznosc);
+  }
+
+  zapisz(klucz, wartosc) { try { localStorage.setItem(klucz, wartosc); } catch (e) {} }
+
+
+
+  ustawTekst(n) {
+    this.zachowajPozycje();
+    this.zapisz('nordvia.tekst', String(n));
+    this.setState({ tekst: n });
+  }
+
+  przelaczMotyw() {
+    const m = this.state.motyw === 'ciemny' ? 'jasny' : 'ciemny';
+    this.zapisz('nordvia.motyw', m);
+    this.setState({ motyw: m });
+  }
+
+  zachowajPozycje() {
+    const maks = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    this.zachowanyUdzial = window.scrollY / maks;
+  }
+
+  /* ---------- postęp ---------- */
+
+  obsluzPrzewijanie() {
+    const y = window.scrollY;
+    if (this.state.widok === 'lista') { this.pozycjaListy = y; this.ostatnieY = y; return; }
+    const maks = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    this.biezacyProcent = Math.min(100, Math.round((y / maks) * 100));
+    if (Math.abs(this.biezacyProcent - (this.state.procentBiezacy || 0)) >= 2) this.setState({ procentBiezacy: this.biezacyProcent });
+    if (y + window.innerHeight >= document.documentElement.scrollHeight - 120) this.przeczytanyTeraz = true;
+    const poprzednie = this.ostatnieY || 0;
+    if (!this.state.szeroki) {
+      if (y > poprzednie + 10 && y > 80 && this.state.pasek) this.setState({ pasek: false });
+      else if (y < poprzednie - 10 && !this.state.pasek) this.setState({ pasek: true });
+    }
+    this.ostatnieY = y;
+  }
+
+  zapiszPostep(natychmiast) {
+    const id = this.state.biezacy;
+    if (!id || this.state.widok !== 'rozdzial') return;
+    const procent = this.biezacyProcent || 0;
+    const stare = this.state.postep[id] || { procent: 0, przeczytany: false };
+    const przeczytany = stare.przeczytany || !!this.przeczytanyTeraz;
+    if (!natychmiast && procent === stare.procent && przeczytany === stare.przeczytany) return;
+    const postep = Object.assign({}, this.state.postep);
+    postep[id] = { procent, przeczytany };
+    this.zapisz('nordvia.postep', JSON.stringify(postep));
+    this.setState({ postep });
+  }
+
+  /* ---------- wstrzykiwanie treści ---------- */
+
+  wstrzyknij() {
+    const el = document.querySelector('.tresc');
+    if (!el || !this.state.dane || this.state.widok !== 'rozdzial') { this.klucz = null; return; }
+    const p = this.indeks[this.state.biezacy];
+    if (!p) return;
+    const klucz = p.id + '|' + this.state.wariant;
+    if (this.klucz === klucz && el.childNodes.length) { return; }
+    this.klucz = klucz;
+    el.innerHTML = this.htmlPozycji(p, this.state.wariant, this.state.dane);
+    const przywolane = this.odnosnikiZalacznikow(el, p);
+    this.wzbogac(el, p);
+    this.przywrocPozycje(p.id);
+    const maTabele = !!el.querySelector('table');
+    if (maTabele !== this.state.maTabele || przywolane.join() !== (this.state.przywolane || []).join()) {
+      this.setState({ maTabele, przywolane });
+    }
+  }
+
+  przywrocPozycje(id) {
+    const doPrzewiniecia = () => {
+      const maks = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      if (this.zachowanyUdzial != null) {
+        window.scrollTo(0, Math.round(this.zachowanyUdzial * maks));
+        this.zachowanyUdzial = null;
+        return;
+      }
+      if (!this.doGory) return;
+      this.doGory = false;
+      this.przeczytanyTeraz = false;
+      const zapis = this.state.postep[id];
+      if (zapis && zapis.procent > 10 && zapis.procent < 90) window.scrollTo(0, Math.round((zapis.procent / 100) * maks));
+      else window.scrollTo(0, 0);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(doPrzewiniecia));
+  }
+
+  /* Wzmianki „załącznik D" w treści stają się odnośnikami do załącznika.
+     Słowa nie zmieniamy — dokładamy tylko kotwicę wokół istniejącego tekstu. */
+  odnosnikiZalacznikow(root, p) {
+    if (p.typ === 'zalacznik') return [];
+    const znalezione = [];
+    const wzor = /(załącznik\w*)(\s+)([A-K])\b((\s*(?:,|i|oraz)\s*)([A-K])\b)?/gi;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        if (!n.nodeValue || n.nodeValue.toLowerCase().indexOf('załącznik') < 0) return NodeFilter.FILTER_REJECT;
+        if (n.parentNode && n.parentNode.closest('a, figcaption')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const wezly = [];
+    let w;
+    while ((w = walker.nextNode())) wezly.push(w);
+    wezly.forEach(node => {
+      const tekst = node.nodeValue;
+      wzor.lastIndex = 0;
+      let ostatni = 0;
+      const frag = document.createDocumentFragment();
+      let m;
+      while ((m = wzor.exec(tekst))) {
+        frag.appendChild(document.createTextNode(tekst.slice(ostatni, m.index)));
+        [m[3], m[6]].forEach((litera, i) => {
+          if (!litera) return;
+          /* Pierwsza kotwica bierze całą frazę „załącznik D" — na telefonie
+             pojedyncza litera jest nietrafialna. */
+          const napis = i === 0 ? (m[1] + m[2] + litera) : litera;
+          if (i === 1) frag.appendChild(document.createTextNode(m[5]));
+          const id = 'zal-' + litera.toUpperCase();
+          if (!this.indeks[id]) { frag.appendChild(document.createTextNode(napis)); return; }
+          if (znalezione.indexOf(litera.toUpperCase()) < 0) znalezione.push(litera.toUpperCase());
+          const a = document.createElement('a');
+          a.href = '#' + id;
+          a.textContent = napis;
+          if (i === 1) { a.style.display = 'inline-block'; a.style.padding = '.15em .3em'; }
+          a.setAttribute('aria-label', 'Otwórz załącznik ' + litera.toUpperCase() + ' — ' + this.indeks[id].tytul);
+          a.style.color = 'var(--akcent)';
+          a.style.textDecoration = 'underline';
+          a.style.textUnderlineOffset = '2px';
+          a.style.padding = '.4em .1em';
+          a.style.margin = '-.4em -.1em';
+          frag.appendChild(a);
+        });
+        ostatni = m.index + m[0].length;
+      }
+      frag.appendChild(document.createTextNode(tekst.slice(ostatni)));
+      node.parentNode.replaceChild(frag, node);
+    });
+    return znalezione.sort();
+  }
+
+  wzbogac(root, p) {
+    const rysunki = this.state.dane.rysunki || {};
+    root.querySelectorAll('figure[data-rysunek]').forEach(fig => {
+      const klucz = fig.getAttribute('data-rysunek');
+      const src = rysunki[klucz];
+      if (!src || fig.querySelector('img')) return;
+      const img = document.createElement('img');
+      img.src = src;
+      const podpis = fig.querySelector('figcaption');
+      img.alt = podpis ? podpis.textContent : 'Rysunek';
+      img.addEventListener('click', () => this.setState({ zoom: src }));
+      fig.insertBefore(img, fig.firstChild);
+      const pasek = document.createElement('div');
+      pasek.className = 'narzedzia-rysunku bez-druku';
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = 'Pobierz PNG';
+      b.setAttribute('aria-label', 'Pobierz rysunek jako PNG');
+      b.addEventListener('click', () => this.pobierzPlik(src, 'nordvia-' + klucz + '.png'));
+      const lupa = document.createElement('button');
+      lupa.type = 'button';
+      lupa.textContent = 'Powiększ';
+      lupa.setAttribute('aria-label', 'Powiększ rysunek na cały ekran');
+      lupa.addEventListener('click', () => this.setState({ zoom: src }));
+      pasek.appendChild(lupa);
+      pasek.appendChild(b);
+      fig.appendChild(pasek);
+    });
+
+    let nr = 0;
+    Array.prototype.slice.call(root.querySelectorAll('table')).forEach(tabela => {
+      nr += 1;
+      const numer = nr;
+      const obwoluta = document.createElement('div');
+      obwoluta.className = 'obwoluta';
+      const przewijak = document.createElement('div');
+      przewijak.className = 'przewijak';
+      tabela.parentNode.insertBefore(obwoluta, tabela);
+      obwoluta.appendChild(przewijak);
+      przewijak.appendChild(tabela);
+      const kolumn = tabela.rows[0] ? tabela.rows[0].cells.length : 0;
+      if (kolumn >= 5) tabela.classList.add('wielokolumnowa');
+      if (kolumn >= 3) {
+        tabela.classList.add('karty');
+        if (tabela.rows[0] && tabela.rows[0].cells[0] && tabela.rows[0].cells[0].tagName === 'TH') {
+          tabela.rows[0].classList.add('naglowek-tabeli');
+        }
+        const naglowki = Array.prototype.slice.call(tabela.rows[0].cells).map(c => (c.textContent || '').trim());
+        Array.prototype.slice.call(tabela.rows).slice(1).forEach(tr => {
+          Array.prototype.slice.call(tr.cells).forEach((td, i) => {
+            if (i > 0 && naglowki[i]) td.setAttribute('data-etykieta', naglowki[i]);
+          });
+        });
+      }
+      Array.prototype.slice.call(tabela.querySelectorAll('td, th')).forEach(k => {
+        if ((k.textContent || '').trim().length <= (kolumn >= 5 ? 9 : 14)) k.classList.add('zwarta');
+      });
+      const narzedzia = document.createElement('div');
+      narzedzia.className = 'narzedzia-tabeli bez-druku';
+      const kopiuj = document.createElement('button');
+      kopiuj.type = 'button';
+      kopiuj.textContent = 'Kopiuj';
+      kopiuj.setAttribute('aria-label', 'Kopiuj tabelę do schowka — wkleja się w Excelu i Arkuszach jako komórki');
+      kopiuj.title = 'Wkleja się w Excelu i Arkuszach jako komórki';
+      kopiuj.addEventListener('click', () => this.doSchowka(this.serializuj(tabela, '\t', false)));
+      const csv = document.createElement('button');
+      csv.type = 'button';
+      csv.textContent = 'CSV';
+      csv.setAttribute('aria-label', 'Pobierz tabelę jako plik CSV');
+      csv.title = 'Plik CSV: średnik, UTF-8 — Excel po polsku otworzy go poprawnie';
+      csv.addEventListener('click', () => this.pobierzCsv(
+        this.serializuj(tabela, ';', true),
+        'nordvia-' + p.id + '-tabela-' + numer + '.csv'
+      ));
+      narzedzia.appendChild(kopiuj);
+      narzedzia.appendChild(csv);
+      obwoluta.appendChild(narzedzia);
+    });
+  }
+
+  /* ---------- eksport ---------- */
+
+  serializuj(tabela, sep, cytuj) {
+    const wiersze = [];
+    Array.prototype.slice.call(tabela.rows).forEach(tr => {
+      const komorki = Array.prototype.slice.call(tr.cells).map(td => {
+        const t = (td.textContent || '').replace(/\s+/g, ' ').trim();
+        if (!cytuj) return t;
+        return /[";\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+      });
+      wiersze.push(komorki.join(sep));
+    });
+    return wiersze.join(cytuj ? '\r\n' : '\n');
+  }
+
+  tytulTabeli(tabela) {
+    let el = tabela.closest('.obwoluta') || tabela;
+    let poprz = el.previousElementSibling;
+    while (poprz && !(poprz.textContent || '').trim()) poprz = poprz.previousElementSibling;
+    return poprz ? (poprz.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120) : '';
+  }
+
+  pobierzDaneRozdzialu() {
+    const root = document.querySelector('.tresc');
+    if (!root) return;
+    const p = this.indeks[this.state.biezacy];
+    const czesci = [];
+    Array.prototype.slice.call(root.querySelectorAll('table')).forEach((t, i) => {
+      const tytul = this.tytulTabeli(t) || ('Tabela ' + (i + 1));
+      czesci.push('"' + tytul.replace(/"/g, '""') + '"');
+      czesci.push(this.serializuj(t, ';', true));
+      czesci.push('');
+    });
+    if (!czesci.length) return;
+    const naglowek = '"' + (p.znak + '. ' + p.tytul).replace(/"/g, '""') + '"';
+    this.pobierzCsv([naglowek, ''].concat(czesci).join('\r\n'), 'nordvia-' + p.id + '-dane.csv');
+  }
+
+  pobierzCsv(tresc, nazwa) {
+    const blob = new Blob(['\uFEFF' + tresc], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    this.pobierzPlik(url, nazwa);
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    this.pokaz('Pobrano ' + nazwa);
+  }
+
+  pobierzPlik(url, nazwa) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nazwa;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  doSchowka(tekst) {
+    const gotowe = () => this.pokaz('Skopiowano — wklej w Excelu lub Arkuszach');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tekst).then(gotowe).catch(() => this.schowekAwaryjnie(tekst, gotowe));
+    } else this.schowekAwaryjnie(tekst, gotowe);
+  }
+
+  schowekAwaryjnie(tekst, gotowe) {
+    const ta = document.createElement('textarea');
+    ta.value = tekst;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); gotowe(); } catch (e) { this.pokaz('Nie udało się skopiować'); }
+    ta.remove();
+  }
+
+  udostepnij() {
+    const url = location.href.split('#')[0] + '#' + this.state.biezacy;
+    const p = this.indeks[this.state.biezacy];
+    if (navigator.share) {
+      navigator.share({ title: p ? p.tytul : 'Nordvia', url }).catch(() => {});
+      return;
+    }
+    this.doSchowka(url);
+    this.pokaz('Link skopiowany');
+  }
+
+  drukuj() { window.print(); }
+
+  pokaz(komunikat) {
+    this.setState({ komunikat });
+    clearTimeout(this.zegarKomunikatu);
+    this.zegarKomunikatu = setTimeout(() => this.setState({ komunikat: null }), 2600);
+  }
+
+  /* ---------- wyszukiwanie ---------- */
+
+  kontekstDla(id, fraza) {
+    const t = this.tekstPelny[id] || '';
+    const i = t.toLowerCase().indexOf(fraza);
+    if (i < 0) return null;
+    const od = Math.max(0, i - 60);
+    return t.slice(od, Math.min(t.length, i + 120)).trim();
+  }
+
+  /* Postęp podajemy w minutach, bo procent przewinięcia nic studentowi nie mówi. */
+  stanCzytania(p, stan) {
+    if (stan.przeczytany) return 'Przeczytany';
+    const slow = p.zrodlo && p.zrodlo.slow;
+    if (!slow) return stan.procent > 2 ? stan.procent + '%' : '';
+    const minuty = Math.max(1, Math.round(slow / 200));
+    if (stan.procent <= 2) return minuty + ' min czytania';
+    return 'zostało ~' + Math.max(1, Math.round(minuty * (1 - stan.procent / 100))) + ' min';
+  }
+
+  /* ---------- render ---------- */
+
+  renderVals() {
+    const s = this.state;
+    const dane = s.dane;
+    const meta = (dane && dane.meta) || {};
+    const rozmiary = ['0.98rem', '1.09rem', '1.22rem'];
+    const wszystkie = this.pozycjeWszystkie;
+    const rozdzialy = wszystkie.filter(p => p.typ !== 'zalacznik');
+    const zalaczniki = wszystkie.filter(p => p.typ === 'zalacznik');
+    const fraza = s.query.trim().toLowerCase();
+    const biezacy = s.biezacy && this.indeks ? this.indeks[s.biezacy] : null;
+    const plan = this.plan();
+    const trybBiezacy = plan[s.tryb] || {};
+
+    const opisPozycji = (p) => {
+      if (p.typ !== 'rozdzial') return p.typ === 'zalacznik' ? 'Załącznik' : 'Część wprowadzająca';
+      const z = p.zrodlo;
+      const czesci = [];
+      if (z.temat) czesci.push(z.temat);
+      if (z.blok) czesci.push(z.blok);
+      if (z.slow) czesci.push(Math.max(1, Math.round(z.slow / 200)) + ' min czytania');
+      if (z.polecen) czesci.push(z.polecen + (z.polecen === 1 ? ' polecenie' : (z.polecen < 5 ? ' polecenia' : ' poleceń')));
+      return czesci.join(' · ');
+    };
+
+    const dopasowane = (fraza ? wszystkie : rozdzialy).filter(p => {
+      if (!fraza) return true;
+      const wMeta = (p.tytul + ' ' + (p.zrodlo.temat || '')).toLowerCase().indexOf(fraza) >= 0;
+      return wMeta || (this.tekstPelny[p.id] || '').toLowerCase().indexOf(fraza) >= 0;
+    });
+
+    const pozycje = dopasowane.map(p => {
+      const stan = s.postep[p.id] || { procent: 0, przeczytany: false };
+      const wTytule = (p.tytul + ' ' + (p.zrodlo.temat || '')).toLowerCase().indexOf(fraza) >= 0;
+      return {
+        id: p.id,
+        znak: p.znak,
+        tytul: p.tytul,
+        opis: opisPozycji(p),
+        kontekst: fraza && !wTytule ? this.kontekstDla(p.id, fraza) : null,
+        pokazPasek: stan.procent > 2 || stan.przeczytany,
+        procentTekst: (stan.przeczytany ? 100 : stan.procent) + '%',
+        stan: this.stanCzytania(p, stan),
+        otworz: () => this.otworz(p.id)
+      };
+    });
+
+    /* Segmenty rozmiaru pokazują „Aa” — wielkie i małe a — więc bez wersalikowania. */
+    const stylSegmentu = (aktywny, dosłownie) => 'min-width:2.9rem;min-height:44px;padding:0 .95rem;font-weight:600;border-radius:999px;cursor:pointer;transition:border-color .18s,color .18s;' +
+      (dosłownie ? 'font-size:.9rem;letter-spacing:0;text-transform:none;' : 'font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;') +
+      'border:1px solid ' + (aktywny ? 'var(--akcent)' : 'var(--linia)') +
+      ';background:' + (aktywny ? 'var(--akcent)' : 'transparent') +
+      ';color:' + (aktywny ? 'var(--karta)' : 'var(--tekst2)');
+
+
+    const stopnieTekstu = ['Aa−', 'Aa', 'Aa+'].map((znak, i) => ({
+      znak,
+      etykieta: ['Mniejszy tekst', 'Domyślny rozmiar tekstu', 'Większy tekst'][i],
+      wybrany: s.tekst === i,
+      style: stylSegmentu(s.tekst === i, true),
+      wybierz: () => this.ustawTekst(i)
+    }));
+
+    /* Rozdziały i załączniki to dwa porządki czytania — nawigacja nie przechodzi między nimi. */
+    const grupa = biezacy ? wszystkie.filter(p => (p.typ === 'zalacznik') === (biezacy.typ === 'zalacznik')) : [];
+    const iBiezacy = biezacy ? grupa.findIndex(p => p.id === biezacy.id) : -1;
+    const poprzedni = iBiezacy > 0 ? grupa[iBiezacy - 1] : null;
+    const nastepny = iBiezacy >= 0 && iBiezacy < grupa.length - 1 ? grupa[iBiezacy + 1] : null;
+
+    const spis = wszystkie.map(p => ({
+      znak: p.znak,
+      tytul: p.tytul,
+      biezacy: biezacy && biezacy.id === p.id ? 'true' : null,
+      stan: (s.postep[p.id] || {}).przeczytany ? '✓' : '',
+      styleSpis: 'display:flex;gap:.6rem;width:100%;min-height:44px;text-align:left;align-items:flex-start;font-size:.86rem;line-height:1.35;padding:.6rem .5rem;border:none;border-radius:8px;cursor:pointer;background:' +
+        (biezacy && biezacy.id === p.id ? 'var(--akcent-tlo)' : 'transparent') +
+        ';color:' + (biezacy && biezacy.id === p.id ? 'var(--akcent)' : 'var(--tekst)') +
+        ';font-weight:' + (biezacy && biezacy.id === p.id ? '600' : '400'),
+      otworz: () => this.otworz(p.id)
+    }));
+
+    const nadtytul = biezacy
+      ? (biezacy.typ === 'rozdzial'
+          ? 'Rozdział ' + biezacy.znak + (biezacy.zrodlo.slow ? ' · ' + Math.max(1, Math.round(biezacy.zrodlo.slow / 200)) + ' min czytania' : '')
+          : (biezacy.typ === 'zalacznik' ? 'Załącznik ' + biezacy.znak : 'Wprowadzenie'))
+      : '';
+
+    return {
+      tytul: meta.tytul || 'Nordvia',
+      podtytul: meta.podtytul || '',
+      wydzial: meta.wydzial || '',
+      wersjaEtykieta: meta.wersja ? 'wersja ' + meta.wersja : '',
+      banerObraz: React.createElement('img', {
+        src: 'baner-terminal.png',
+        alt: 'Hala odlotów z widokiem na płytę lotniska',
+        style: { display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 55%' }
+      }),
+      /* Wykresy mają 2400–2500 px; w skali „do ekranu” są nieczytelne, więc druga skala przewija w naturalnej. */
+      zoomObraz: s.zoom ? React.createElement('img', {
+        src: s.zoom,
+        alt: 'Powiększony rysunek',
+        style: s.zoomPelna
+          ? { width: 'auto', maxWidth: 'none', height: 'auto', background: '#fff', flexShrink: 0 }
+          : { maxWidth: '100%', height: 'auto', background: '#fff', borderRadius: '6px' }
+      }) : null,
+      zoomSkala: () => this.setState({ zoomPelna: !s.zoomPelna }),
+      zoomSkalaZnak: s.zoomPelna ? 'Dopasuj do ekranu' : 'Naturalna skala',
+      zoomPodpowiedz: s.zoomPelna ? 'Przewiń, żeby obejrzeć szczegóły' : 'Dotknij, żeby zamknąć',
+      pasekGorny: [meta.tytul, 'zarządzanie operacyjne'].filter(Boolean).join(' · '),
+      pomoc: s.pomoc,
+      pomocSzukanie: this.dymek('szukanie'),
+      pomocTryb: this.dymek('tryb'),
+      pomocPlan: this.dymek('plan'),
+      pomocZalaczniki: this.dymek('zalaczniki'),
+      pomocRozdzial: this.dymek('rozdzial'),
+      pomocRozmiar: this.dymek('rozmiar'),
+      pomocZnak: s.pomoc ? 'Pomoc: wł.' : 'Pomoc: wył.',
+      pomocEtykieta: s.pomoc ? 'Wyłącz dymki pomocy' : 'Włącz dymki pomocy',
+      pomocStyle: 'min-height:44px;padding:0 .95rem;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;cursor:pointer;border:1px solid ' +
+        (s.pomoc ? 'var(--akcent)' : 'var(--linia)') + ';background:' + (s.pomoc ? 'var(--akcent-tlo)' : 'transparent') +
+        ';color:' + (s.pomoc ? 'var(--akcent)' : 'var(--tekst2)'),
+      liczbaZalacznikow: zalaczniki.length,
+      postepBiezacy: (s.procentBiezacy || 0) + '%',
+      tekstZabezpieczony: (this.props.blokadaKopiowania ?? true),
+      przyciskUstawien: !s.szerokiPlus,
+      ustawieniaOtwarte: s.ustawieniaOtwarte,
+      ustawieniaZnak: s.ustawieniaOtwarte ? 'Ukryj' : 'Pokaż',
+      przelaczUstawienia: () => this.setState({ ustawieniaOtwarte: !s.ustawieniaOtwarte }),
+      przelaczPomoc: () => this.przelaczPomoc(),
+      styleKolumnyNarzedzi: s.szerokiPlus
+        ? 'position:sticky;top:1.4rem;order:2;display:grid;gap:1rem;align-content:start'
+        : 'order:-1;display:grid;gap:.8rem;margin-bottom:1.8rem',
+      zaslona: !!s.zaslona,
+      szerokoscListy: s.szeroki ? '64rem' : '100%',
+      paddingBanera: s.szeroki ? '7rem 2.2rem 2.4rem' : '5rem 1.1rem 1.8rem',
+      rozmiarTytulu: s.szeroki ? '3.6rem' : '2.4rem',
+      kolumnyPulpitu: s.szerokiPlus ? 'minmax(0,1fr) 17rem' : '1fr',
+      odstepPulpitu: s.szerokiPlus ? '3.2rem' : '1.6rem',
+      styleNarzedzi: s.szerokiPlus
+        ? 'display:grid;gap:1.4rem'
+        : (s.ustawieniaOtwarte ? 'display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1.2rem 1.6rem;margin-top:1rem' : 'display:none'),
+      naLiscie: s.widok === 'lista',
+      wRozdziale: s.widok === 'rozdzial' && !!biezacy,
+      spisWidoczny: s.szeroki && s.widok === 'rozdzial' && !!biezacy,
+      marginLewy: s.szeroki && s.widok === 'rozdzial' && biezacy ? '19.5rem' : '0',
+      /* Narracja czyta się w węższej kolumnie; załączniki to tabele danych i potrzebują miejsca. */
+      szerokoscKolumny: biezacy && biezacy.typ === 'zalacznik' ? '62rem' : '39rem',
+      rozmiarTekstu: rozmiary[s.tekst] || rozmiary[1],
+      query: s.query,
+      szukaj: (e) => this.setState({ query: e.target.value }),
+      brakWynikow: !!fraza && pozycje.length === 0,
+      pozycje: (fraza || !(this.props.pokazPlanZajec ?? true)) ? pozycje : [],
+      planWidoczny: !fraza && plan.length > 0 && (this.props.pokazPlanZajec ?? true),
+      tryby: plan.map((p, i) => ({
+        nazwa: p.nazwa,
+        wybrany: s.tryb === i,
+        style: stylSegmentu(s.tryb === i),
+        wybierz: () => this.ustawTryb(i)
+      })),
+      opisTrybu: trybBiezacy.opis || '',
+      notaPlanu: trybBiezacy.nota || '',
+      /* Trzy części dokumentu dostają jednakową prezentację, żeby numeracja 1–2–3 była widoczna.
+         „Jak korzystać” stoi w dokumencie przed częściami, więc numeru nie dostaje. */
+      maInstrukcje: !!this.indeks['wstep'],
+      instrukcja: (() => {
+        const p = this.indeks['wstep'];
+        if (!p) return null;
+        return { tytul: p.tytul, opis: 'Jak czytać kejs i czego się po nim oczekuje', otworz: () => this.otworz('wstep') };
+      })(),
+      maCzescPierwsza: !!this.indeks['firma'],
+      czescPierwsza: (() => {
+        const p = this.indeks['firma'];
+        if (!p) return null;
+        const sekcje = (p.zrodlo.sekcje || []).map(x => x.tytul).filter(Boolean);
+        return {
+          tytul: p.tytul.replace(/^Część pierwsza\.\s*/i, ''),
+          opis: sekcje.length > 1 ? sekcje.join(' · ') : 'Czyta się raz, na początku semestru',
+          otworz: () => this.otworz('firma')
+        };
+      })(),
+      spotkania: (trybBiezacy.grupy || []).map(g => ({
+        numer: g.numer,
+        etykieta: trybBiezacy.etykieta,
+        style: 'display:grid;grid-template-columns:4.2rem 1fr;gap:1.4rem;align-items:start;padding:1.1rem .6rem;border-bottom:1px solid var(--linia)',
+        kolorNumeru: 'var(--tekst2)',
+        styleEtykiety: 'font-size:.72rem;color:var(--tekst2)',
+        czas: g.czas,
+        rozdzialy: g.numery.map(n => {
+          const p = rozdzialy.filter(x => x.typ === 'rozdzial' && x.zrodlo.numer === n)[0];
+          if (!p) return { numer: String(n), tytul: '', opis: '', pokazPasek: false, procentTekst: '0%', stan: '', otworz: () => {} };
+          const stan = s.postep[p.id] || { procent: 0, przeczytany: false };
+          return {
+            numer: String(n),
+            tytul: p.tytul,
+            opis: [p.zrodlo.temat, p.zrodlo.polecen ? p.zrodlo.polecen + (p.zrodlo.polecen === 1 ? ' polecenie' : (p.zrodlo.polecen < 5 ? ' polecenia' : ' poleceń')) : null].filter(Boolean).join(' · '),
+            pokazPasek: stan.procent > 2 || stan.przeczytany,
+            procentTekst: (stan.przeczytany ? 100 : stan.procent) + '%',
+            stan: this.stanCzytania(p, stan),
+            otworz: () => this.otworz(p.id)
+          };
+        })
+      })),
+      zalaczniki: zalaczniki.map(z => ({ znak: z.znak, tytul: z.tytul, otworz: () => this.otworz(z.id) })),
+      zalOtwarte: s.zalOtwarte,
+      zalZnak: s.zalOtwarte ? 'Ukryj' : 'Pokaż',
+      przelaczZalaczniki: () => this.setState({ zalOtwarte: !s.zalOtwarte }),
+      stopnieTekstu,
+      motywZnak: s.motyw === 'ciemny' ? 'Motyw: ciemny' : 'Motyw: jasny',
+      motywEtykieta: s.motyw === 'ciemny' ? 'Włącz motyw jasny' : 'Włącz motyw ciemny',
+      przelaczMotyw: () => this.przelaczMotyw(),
+      spis,
+      tytulBiezacy: biezacy ? biezacy.tytul : '',
+      nadtytul,
+      pasekMobilny: !s.szeroki,
+      pasekTransform: s.pasek ? 'translateY(0)' : 'translateY(-110%)',
+      wroc: () => this.wroc(),
+      udostepnij: () => this.udostepnij(),
+      drukuj: () => this.drukuj(),
+      jestPrzeczytany: !!(biezacy && (s.postep[biezacy.id] || {}).przeczytany),
+      znakPrzeczytany: biezacy && (s.postep[biezacy.id] || {}).przeczytany ? 'Przeczytany ✓' : 'Oznacz jako przeczytany',
+      stylPrzeczytany: 'min-height:44px;padding:0 1.1rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;cursor:pointer;border:1px solid ' +
+        (biezacy && (s.postep[biezacy.id] || {}).przeczytany ? 'var(--zloto)' : 'var(--linia)') +
+        ';background:' + (biezacy && (s.postep[biezacy.id] || {}).przeczytany ? 'var(--zloto-tlo)' : 'transparent') +
+        ';color:' + (biezacy && (s.postep[biezacy.id] || {}).przeczytany ? 'var(--zloto)' : 'var(--tekst)'),
+      przelaczPrzeczytany: () => this.przelaczPrzeczytany(),
+      wyczyscPostep: () => this.wyczyscPostep(),
+      podsumowaniePostepu: (() => {
+        const rozdz = wszystkie.filter(p => p.typ === 'rozdzial');
+        const gotowe = rozdz.filter(p => (s.postep[p.id] || {}).przeczytany).length;
+        if (!gotowe) return 'Żaden rozdział nie jest jeszcze oznaczony jako przeczytany.';
+        return 'Przeczytane: ' + gotowe + ' z ' + rozdz.length + ' rozdziałów.';
+      })(),
+      maTabele: !!s.maTabele,
+      maPowrotDoRozdzialu: !!(this.skokZ && biezacy && biezacy.typ === 'zalacznik' && this.indeks[this.skokZ]),
+      powrotDoRozdzialuTytul: this.skokZ && this.indeks[this.skokZ]
+        ? (this.indeks[this.skokZ].typ === 'rozdzial' ? 'Rozdział ' + this.indeks[this.skokZ].znak + '. ' : '') + this.indeks[this.skokZ].tytul
+        : '',
+      doRozdzialu: () => { const cel = this.skokZ; this.skokZ = null; if (cel) this.otworz(cel); },
+      maPrzywolane: !!(s.przywolane && s.przywolane.length),
+      przywolane: (s.przywolane || []).map(litera => {
+        const poz = this.indeks['zal-' + litera];
+        return { litera, tytul: poz ? poz.tytul : '', otworz: () => this.otworz('zal-' + litera) };
+      }),
+      pobierzDaneRozdzialu: () => this.pobierzDaneRozdzialu(),
+      maPoprzedni: !!poprzedni,
+      maNastepny: !!nastepny,
+      poprzedniTytul: poprzedni ? (poprzedni.typ === 'rozdzial' ? poprzedni.znak + '. ' : '') + poprzedni.tytul : '',
+      nastepnyTytul: nastepny ? (nastepny.typ === 'rozdzial' ? nastepny.znak + '. ' : '') + nastepny.tytul : '',
+      doPoprzedniego: () => poprzedni && this.otworz(poprzedni.id),
+      doNastepnego: () => nastepny && this.otworz(nastepny.id),
+      zoom: s.zoom,
+      zamknijZoom: () => this.setState({ zoom: null, zoomPelna: false }),
+      komunikat: s.komunikat
+    };
+  }
+}
+
+</script>
+</body>
+</html>
