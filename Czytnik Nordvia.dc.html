@@ -420,7 +420,6 @@ class Component extends DCLogic {
     dane: null,
     widok: 'lista',
     biezacy: null,
-    wariant: 'H',
     tekst: (() => { try { return parseInt(localStorage.getItem('nordvia.tekst') || '1', 10); } catch (e) { return 1; } })(),
     motyw: (() => {
       try {
@@ -557,7 +556,7 @@ class Component extends DCLogic {
     const el = document.createElement('div');
     this.pozycjeDane(dane).forEach(p => {
       this.indeks[p.id] = p;
-      el.innerHTML = this.htmlPozycji(p, 'H', dane) + (p.typ === 'rozdzial' ? this.htmlPozycji(p, 'A', dane) : '');
+      el.innerHTML = this.htmlPozycji(p, dane);
       this.tekstPelny[p.id] = (el.textContent || '').replace(/\s+/g, ' ').trim();
     });
     el.innerHTML = '';
@@ -577,10 +576,9 @@ class Component extends DCLogic {
     return this.state.dane ? this.pozycjeDane(this.state.dane) : [];
   }
 
-  htmlPozycji(p, wariant, dane) {
+  htmlPozycji(p, dane) {
     const z = p.zrodlo;
-    if (p.typ === 'rozdzial') return z.tresc[wariant] || z.tresc.H || z.tresc.A || '';
-    if (p.typ === 'zalacznik') return z.html || '';
+    if (p.typ === 'rozdzial' || p.typ === 'zalacznik') return z.html || '';
     return (z.sekcje || []).map(s => (s.tytul && s.tytul !== p.tytul ? '<h3>' + s.tytul + '</h3>' : '') + s.html).join('');
   }
 
@@ -840,10 +838,10 @@ class Component extends DCLogic {
     if (!el || !this.state.dane || this.state.widok !== 'rozdzial') { this.klucz = null; return; }
     const p = this.indeks[this.state.biezacy];
     if (!p) return;
-    const klucz = p.id + '|' + this.state.wariant;
+    const klucz = p.id;
     if (this.klucz === klucz && el.childNodes.length) { return; }
     this.klucz = klucz;
-    el.innerHTML = this.htmlPozycji(p, this.state.wariant, this.state.dane);
+    el.innerHTML = this.htmlPozycji(p, this.state.dane);
     const przywolane = this.odnosnikiZalacznikow(el, p);
     this.wzbogac(el, p);
     this.przywrocPozycje(p.id);
@@ -1120,6 +1118,14 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state;
+    /* Render nie startuje przed danymi: indeks i teksty powstają dopiero w ustawDane(). */
+    if (!s.dane || !this.indeks) {
+      return {
+        spisWidoczny: false, naLiscie: false, wRozdziale: false,
+        zoom: false, zaslona: false, komunikat: '',
+        marginLewy: '0', query: ''
+      };
+    }
     const dane = s.dane;
     const meta = (dane && dane.meta) || {};
     const rozmiary = ['0.98rem', '1.09rem', '1.22rem'];

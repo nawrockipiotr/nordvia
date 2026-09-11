@@ -14,6 +14,8 @@ Otwiera się dwuklikiem z dysku, działa bez internetu i bez instalacji.
 | `baner-terminal.png` | zdjęcie w główce |
 | `sw.js`, `manifest.webmanifest`, `ikona-*.png` | tryb offline i dodanie do ekranu głównego (tylko przy wdrożeniu na serwer) |
 
+Wydanie: **2026-09-11**.
+
 ## Publikacja
 
 **Rozdanie studentom pliku** — wyślij sam `index.html` (Basecamp, Kampus, mail). Nic więcej nie jest potrzebne.
@@ -36,6 +38,6 @@ Uwaga: w wersji rozdawanej jako plik z dysku bufor offline (`sw.js`) się nie ur
 
 ## Aktualizacja treści
 
-Treść jest w `kejs.json`. Po zmianie podmień plik i przebuduj `index.html` — źródłem jest `Czytnik Nordvia.dc.html`. Struktura danych: `meta`, `czesc_wstepna`, `firma`, `rozdzialy[]` (`tresc.H`), `zalaczniki[]`, `rysunki{}`.
+Treść jest w `kejs.json`. Po zmianie podmień plik, podbij `meta.wersja` (data wydania widoczna w główce) i przebuduj `index.html` — źródłem jest `Czytnik Nordvia.dc.html`. Struktura danych: `meta`, `czesc_wstepna`, `firma`, `rozdzialy[]` (`html`), `zalaczniki[]`, `rysunki{}`.
 
 Treść odpowiada dokumentowi `Nordvia - kejs dla studentow.docx`: śródtytuły, tabele, rysunki i polecenia sprawdzone rozdział po rozdziale.

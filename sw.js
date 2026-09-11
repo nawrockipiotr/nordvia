@@ -2,7 +2,7 @@
    Wersja w nazwie pamięci: nowy build unieważnia stary bufor.
    Dokument i dane biorą najpierw sieć, bufor jest awaryjny — poprawiony kejs.json
    dociera do studenta przy pierwszym otwarciu z internetem. */
-const WERSJA = '2026-09-11-1';
+const WERSJA = '2026-09-11-2';
 const C = 'nordvia-' + WERSJA;
 const POWLOKA = ['./', './index.html', './manifest.webmanifest', './ikona-192.png', './ikona-512.png'];
 
